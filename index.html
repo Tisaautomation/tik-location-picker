@@ -4,13 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Select Pickup Location</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     font-family: 'DM Sans', sans-serif;
     background: #e0e0e5;
@@ -21,7 +17,6 @@
     padding: 16px;
     color: #3a3a45;
   }
-
   .card {
     width: 100%;
     max-width: 480px;
@@ -31,68 +26,45 @@
     overflow: hidden;
     margin-top: 8px;
   }
-
-  .header {
-    padding: 20px 24px 16px;
-  }
-
+  .header { padding: 16px 20px 14px; }
   .header-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     margin-bottom: 14px;
   }
-
-  .logo {
-    height: 56px;
-  }
-
+  .logo { height: 72px; width: auto; flex-shrink: 0; }
   .booking-badge {
     background: #e0e0e5;
     box-shadow: inset 3px 3px 6px #b8b8bd, inset -3px -3px 6px #ffffff;
-    border-radius: 14px;
-    padding: 10px 24px;
-    text-align: right;
-  }
-
-  .booking-badge span {
-    font-size: 12px;
-    font-weight: 500;
-    color: #6b6b78;
-    letter-spacing: 0.5px;
-  }
-
-  .booking-badge strong {
-    font-size: 24px;
-    font-weight: 700;
-    color: #7c3aed;
-    display: block;
-    margin-top: 2px;
-  }
-
-  .header-bottom {
+    border-radius: 16px;
+    padding: 12px 24px;
     text-align: center;
+    flex-shrink: 0;
   }
-
-  .title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #3a3a45;
-  }
-
-  .subtitle {
-    font-size: 13px;
-    color: #8a8a95;
-    margin-top: 4px;
-  }
-
-  #map {
+  .booking-badge span { font-size: 11px; font-weight: 600; color: #6b6b78; letter-spacing: 1px; text-transform: uppercase; }
+  .booking-badge strong { font-size: 28px; font-weight: 700; color: #7c3aed; display: block; margin-top: 2px; line-height: 1; }
+  .header-bottom { text-align: center; padding-bottom: 4px; }
+  .title { font-size: 22px; font-weight: 700; color: #3a3a45; }
+  .subtitle { font-size: 13px; color: #8a8a95; margin-top: 3px; }
+  .search-wrap { padding: 0 16px 12px; position: relative; }
+  .search-icon { position: absolute; left: 30px; top: 50%; transform: translateY(-50%); color: #8a8a95; pointer-events: none; z-index: 2; }
+  .search-icon svg { width: 16px; height: 16px; }
+  .search-bar {
     width: 100%;
-    height: 340px;
-    border-top: 1px solid #d0d0d5;
-    border-bottom: 1px solid #d0d0d5;
+    padding: 14px 16px 14px 42px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: #3a3a45;
+    background: #e0e0e5;
+    box-shadow: inset 3px 3px 6px #b8b8bd, inset -3px -3px 6px #ffffff;
+    outline: none;
   }
-
+  .search-bar::placeholder { color: #a0a0ab; }
+  #map { width: 100%; height: 340px; border-top: 1px solid #d0d0d5; border-bottom: 1px solid #d0d0d5; }
   .address-bar {
     padding: 14px 20px;
     background: #e0e0e5;
@@ -104,127 +76,38 @@
     align-items: center;
     gap: 10px;
   }
-
-  .address-bar .pin-icon {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    background: #F59E0B;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    color: white;
-    font-weight: 700;
+  .pin-icon {
+    flex-shrink: 0; width: 28px; height: 28px; background: #F59E0B; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: white; font-weight: 700;
     box-shadow: 2px 2px 6px #b8b8bd, -2px -2px 6px #ffffff;
   }
-
-  .address-text {
-    font-size: 13px;
-    color: #4a4a55;
-    line-height: 1.4;
-    word-break: break-word;
+  .address-text { font-size: 13px; color: #4a4a55; line-height: 1.4; word-break: break-word; }
+  .address-text.placeholder { color: #a0a0ab; font-style: italic; }
+  .actions { padding: 0 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .btn {
+    width: 100%; padding: 16px; border: none; border-radius: 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s ease; letter-spacing: 0.3px;
   }
-
-  .address-text.placeholder {
-    color: #a0a0ab;
-    font-style: italic;
-  }
-
-  .actions {
-    padding: 0 16px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .btn-confirm {
-    width: 100%;
-    padding: 16px;
-    border: none;
-    border-radius: 16px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    letter-spacing: 0.3px;
-  }
-
-  .btn-confirm.primary {
-    background: #22C55E;
-    color: white;
-    box-shadow: 4px 4px 12px #b8b8bd, -4px -4px 12px #ffffff;
-  }
-
-  .btn-confirm.primary:active {
-    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.15), inset -3px -3px 6px rgba(255,255,255,0.1);
-    transform: scale(0.98);
-  }
-
-  .btn-confirm.primary:disabled {
-    background: #a0a0ab;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-
-  .btn-confirm.secondary {
-    background: #e0e0e5;
-    color: #6b6b78;
-    box-shadow: 4px 4px 12px #b8b8bd, -4px -4px 12px #ffffff;
-  }
-
-  .btn-confirm.secondary:active {
-    box-shadow: inset 3px 3px 6px #b8b8bd, inset -3px -3px 6px #ffffff;
-  }
-
-  .status-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(224,224,229,0.92);
-    z-index: 1000;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-  }
-
+  .btn.primary { background: #22C55E; color: white; box-shadow: 4px 4px 12px #b8b8bd, -4px -4px 12px #ffffff; }
+  .btn.primary:active { box-shadow: inset 3px 3px 6px rgba(0,0,0,0.15); transform: scale(0.98); }
+  .btn.primary:disabled { background: #a0a0ab; cursor: not-allowed; box-shadow: none; }
+  .btn.secondary { background: #e0e0e5; color: #6b6b78; box-shadow: 4px 4px 12px #b8b8bd, -4px -4px 12px #ffffff; }
+  .btn.secondary:active { box-shadow: inset 3px 3px 6px #b8b8bd, inset -3px -3px 6px #ffffff; }
+  .status-overlay { display: none; position: fixed; inset: 0; background: rgba(224,224,229,0.92); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
   .status-overlay.show { display: flex; }
-
-  .status-box {
-    background: #e0e0e5;
-    border-radius: 24px;
-    box-shadow: 8px 8px 20px #b8b8bd, -8px -8px 20px #ffffff;
-    padding: 32px 40px;
-    text-align: center;
-  }
-
+  .status-box { background: #e0e0e5; border-radius: 24px; box-shadow: 8px 8px 20px #b8b8bd, -8px -8px 20px #ffffff; padding: 32px 40px; text-align: center; }
   .status-box .icon { font-size: 40px; margin-bottom: 12px; }
   .status-box .msg { font-size: 16px; font-weight: 600; color: #3a3a45; }
   .status-box .sub { font-size: 13px; color: #8a8a95; margin-top: 6px; }
-
-  .spinner {
-    width: 36px; height: 36px;
-    border: 3px solid #d0d0d5;
-    border-top: 3px solid #7c3aed;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 12px;
-  }
-
+  .spinner { width: 36px; height: 36px; border: 3px solid #d0d0d5; border-top: 3px solid #7c3aed; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .error-card {
-    text-align: center;
-    padding: 40px 24px;
-  }
-
-  .error-card .icon { font-size: 40px; margin-bottom: 12px; }
+  .error-card { text-align: center; padding: 40px 24px; }
   .error-card .msg { font-size: 16px; font-weight: 600; }
-
-  .leaflet-container { font-family: 'DM Sans', sans-serif; }
+  .pac-container { border-radius: 12px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.15); font-family: 'DM Sans', sans-serif; margin-top: 4px; }
+  .pac-item { padding: 10px 14px; font-size: 13px; cursor: pointer; }
+  .pac-item:hover { background: #f0f0f5; }
 </style>
 </head>
 <body>
@@ -240,8 +123,13 @@
     </div>
     <div class="header-bottom">
       <div class="title">Select Pickup Location</div>
-      <div class="subtitle">Drag the pin to the exact pickup point</div>
+      <div class="subtitle">Search or drag the pin to the pickup point</div>
     </div>
+  </div>
+
+  <div class="search-wrap">
+    <div class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+    <input type="text" id="searchInput" class="search-bar" placeholder="Search hotel, address, place...">
   </div>
 
   <div id="map"></div>
@@ -252,13 +140,13 @@
   </div>
 
   <div class="actions">
-    <button class="btn-confirm primary" id="btnConfirm" disabled onclick="submitLocation()">Accept</button>
-    <button class="btn-confirm secondary" onclick="resetPin()">Reset Pin</button>
+    <button class="btn primary" id="btnConfirm" disabled onclick="submitLocation()">Accept</button>
+    <button class="btn secondary" onclick="resetPin()">Reset Pin</button>
   </div>
 </div>
 
 <div class="status-overlay" id="statusOverlay">
-  <div class="status-box" id="statusBox">
+  <div class="status-box">
     <div class="spinner" id="statusSpinner"></div>
     <div class="icon" id="statusIcon" style="display:none"></div>
     <div class="msg" id="statusMsg">Sending location...</div>
@@ -268,7 +156,6 @@
 
 <div class="card" id="errorCard" style="display:none">
   <div class="error-card">
-    <div class="icon">X</div>
     <div class="msg">Missing booking ID in URL</div>
   </div>
 </div>
@@ -277,51 +164,72 @@
   var WEBHOOK_URL = 'https://timelessconcept.app.n8n.cloud/webhook/pick-location';
   var DEFAULT_LAT = 9.5120;
   var DEFAULT_LNG = 100.0136;
-
-  var map, marker;
+  var map, marker, geocoder, autocomplete;
   var selectedLat = null, selectedLng = null, selectedAddress = '';
   var bookingId = '';
 
-  var params = new URLSearchParams(window.location.search);
-  bookingId = params.get('bookingId') || '';
+  var p = new URLSearchParams(window.location.search);
+  bookingId = p.get('bookingId') || '';
 
   if (!bookingId) {
     document.getElementById('mainCard').style.display = 'none';
     document.getElementById('errorCard').style.display = 'block';
   } else {
-    var display = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
-    document.getElementById('bookingDisplay').textContent = display;
-    initMap();
+    var d = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
+    document.getElementById('bookingDisplay').textContent = d;
   }
 
   function initMap() {
-    map = L.map('map', { zoomControl: true, attributionControl: false }).setView([DEFAULT_LAT, DEFAULT_LNG], 13);
+    if (!bookingId) return;
+    var center = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
-    }).addTo(map);
-
-    var yellowIcon = L.divIcon({
-      className: '',
-      html: '<div style="width:28px;height:28px;background:#F59E0B;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>',
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: center, zoom: 13, disableDefaultUI: true, zoomControl: true,
+      styles: [
+        { featureType: 'poi', stylers: [{ visibility: 'simplified' }] },
+        { featureType: 'transit', stylers: [{ visibility: 'off' }] }
+      ]
     });
 
-    marker = L.marker([DEFAULT_LAT, DEFAULT_LNG], { draggable: true, icon: yellowIcon }).addTo(map);
+    geocoder = new google.maps.Geocoder();
 
-    marker.on('dragend', function() {
-      var pos = marker.getLatLng();
-      selectedLat = pos.lat;
-      selectedLng = pos.lng;
+    marker = new google.maps.Marker({
+      position: center, map: map, draggable: true, animation: google.maps.Animation.DROP
+    });
+
+    marker.addListener('dragend', function() {
+      var pos = marker.getPosition();
+      selectedLat = pos.lat();
+      selectedLng = pos.lng();
       reverseGeocode(selectedLat, selectedLng);
     });
 
-    map.on('click', function(e) {
-      marker.setLatLng(e.latlng);
-      selectedLat = e.latlng.lat;
-      selectedLng = e.latlng.lng;
+    map.addListener('click', function(e) {
+      marker.setPosition(e.latLng);
+      selectedLat = e.latLng.lat();
+      selectedLng = e.latLng.lng();
       reverseGeocode(selectedLat, selectedLng);
+    });
+
+    autocomplete = new google.maps.places.Autocomplete(
+      document.getElementById('searchInput'),
+      { componentRestrictions: { country: 'th' }, fields: ['geometry', 'formatted_address', 'name'] }
+    );
+    autocomplete.bindTo('bounds', map);
+
+    autocomplete.addListener('place_changed', function() {
+      var place = autocomplete.getPlace();
+      if (!place.geometry || !place.geometry.location) return;
+      map.setCenter(place.geometry.location);
+      map.setZoom(16);
+      marker.setPosition(place.geometry.location);
+      selectedLat = place.geometry.location.lat();
+      selectedLng = place.geometry.location.lng();
+      selectedAddress = place.name ? place.name + ', ' + place.formatted_address : place.formatted_address;
+      var el = document.getElementById('addressText');
+      el.textContent = selectedAddress;
+      el.classList.remove('placeholder');
+      document.getElementById('btnConfirm').disabled = false;
     });
   }
 
@@ -329,43 +237,32 @@
     var el = document.getElementById('addressText');
     el.textContent = 'Loading address...';
     el.classList.add('placeholder');
-
-    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1')
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (data && data.display_name) {
-          selectedAddress = data.display_name;
-          el.textContent = selectedAddress;
-          el.classList.remove('placeholder');
-        } else {
-          selectedAddress = lat.toFixed(6) + ', ' + lng.toFixed(6);
-          el.textContent = selectedAddress;
-          el.classList.remove('placeholder');
-        }
-        document.getElementById('btnConfirm').disabled = false;
-      })
-      .catch(function() {
+    geocoder.geocode({ location: { lat: lat, lng: lng } }, function(results, status) {
+      if (status === 'OK' && results[0]) {
+        selectedAddress = results[0].formatted_address;
+      } else {
         selectedAddress = lat.toFixed(6) + ', ' + lng.toFixed(6);
-        el.textContent = selectedAddress;
-        el.classList.remove('placeholder');
-        document.getElementById('btnConfirm').disabled = false;
-      });
+      }
+      el.textContent = selectedAddress;
+      el.classList.remove('placeholder');
+      document.getElementById('btnConfirm').disabled = false;
+    });
   }
 
   function resetPin() {
-    marker.setLatLng([DEFAULT_LAT, DEFAULT_LNG]);
-    map.setView([DEFAULT_LAT, DEFAULT_LNG], 13);
-    selectedLat = null;
-    selectedLng = null;
-    selectedAddress = '';
+    var center = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
+    marker.setPosition(center);
+    map.panTo(center);
+    map.setZoom(13);
+    selectedLat = null; selectedLng = null; selectedAddress = '';
     document.getElementById('addressText').textContent = 'Move the pin to select a location';
     document.getElementById('addressText').classList.add('placeholder');
     document.getElementById('btnConfirm').disabled = true;
+    document.getElementById('searchInput').value = '';
   }
 
   function submitLocation() {
     if (!selectedLat || !selectedLng) return;
-
     var overlay = document.getElementById('statusOverlay');
     overlay.classList.add('show');
     document.getElementById('statusSpinner').style.display = 'block';
@@ -376,23 +273,12 @@
     var bid = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
     var mapsUrl = 'https://www.google.com/maps?q=' + selectedLat + ',' + selectedLng;
 
-    var payload = {
-      bookingId: bid,
-      latitude: selectedLat,
-      longitude: selectedLng,
-      address: selectedAddress,
-      mapsUrl: mapsUrl
-    };
-
     fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ bookingId: bid, latitude: selectedLat, longitude: selectedLng, address: selectedAddress, mapsUrl: mapsUrl })
     })
-    .then(function(r) {
-      if (!r.ok) throw new Error('Server error');
-      return r.text();
-    })
+    .then(function(r) { if (!r.ok) throw new Error('err'); return r.text(); })
     .then(function() {
       document.getElementById('statusSpinner').style.display = 'none';
       document.getElementById('statusIcon').style.display = 'block';
@@ -400,7 +286,7 @@
       document.getElementById('statusMsg').textContent = 'Location sent!';
       document.getElementById('statusSub').textContent = 'You can close this window';
     })
-    .catch(function(err) {
+    .catch(function() {
       document.getElementById('statusSpinner').style.display = 'none';
       document.getElementById('statusIcon').style.display = 'block';
       document.getElementById('statusIcon').textContent = '!';
@@ -410,7 +296,6 @@
     });
   }
 </script>
-
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB93UHgEeBL2SljHS7Jqekw5ZSBppdrm3w&libraries=places&callback=initMap"></script>
 </body>
 </html>
-
