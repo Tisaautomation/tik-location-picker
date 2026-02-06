@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Select Pickup Location</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 
@@ -106,6 +108,8 @@
     align-items: center;
     justify-content: center;
     font-size: 14px;
+    color: white;
+    font-weight: 700;
     box-shadow: 2px 2px 6px #b8b8bd, -2px -2px 6px #ffffff;
   }
 
@@ -212,6 +216,8 @@
 
   .error-card .icon { font-size: 40px; margin-bottom: 12px; }
   .error-card .msg { font-size: 16px; font-weight: 600; }
+
+  .leaflet-container { font-family: 'DM Sans', sans-serif; }
 </style>
 </head>
 <body>
@@ -257,103 +263,87 @@
 </div>
 
 <script>
-  // Config
-  const WEBHOOK_URL = 'https://timelessconcept.app.n8n.cloud/webhook/pick-location';
-  const DEFAULT_LAT = 9.5120;
-  const DEFAULT_LNG = 100.0136;
+  var WEBHOOK_URL = 'https://timelessconcept.app.n8n.cloud/webhook/pick-location';
+  var DEFAULT_LAT = 9.5120;
+  var DEFAULT_LNG = 100.0136;
 
-  // State
-  let map, marker, geocoder;
-  let selectedLat = null, selectedLng = null, selectedAddress = '';
-  let bookingId = '';
+  var map, marker;
+  var selectedLat = null, selectedLng = null, selectedAddress = '';
+  var bookingId = '';
 
-  // Parse booking ID from URL
-  const params = new URLSearchParams(window.location.search);
+  var params = new URLSearchParams(window.location.search);
   bookingId = params.get('bookingId') || '';
 
   if (!bookingId) {
     document.getElementById('mainCard').style.display = 'none';
     document.getElementById('errorCard').style.display = 'block';
   } else {
-    const display = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
+    var display = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
     document.getElementById('bookingDisplay').textContent = display;
+    initMap();
   }
 
   function initMap() {
-    if (!bookingId) return;
+    map = L.map('map', { zoomControl: true, attributionControl: false }).setView([DEFAULT_LAT, DEFAULT_LNG], 13);
 
-    const center = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(map);
 
-    map = new google.maps.Map(document.getElementById('map'), {
-      center: center,
-      zoom: 13,
-      disableDefaultUI: true,
-      zoomControl: true,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: false,
-      styles: [
-        { featureType: 'poi', stylers: [{ visibility: 'simplified' }] },
-        { featureType: 'transit', stylers: [{ visibility: 'off' }] }
-      ]
+    var yellowIcon = L.divIcon({
+      className: '',
+      html: '<div style="width:28px;height:28px;background:#F59E0B;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
     });
 
-    geocoder = new google.maps.Geocoder();
+    marker = L.marker([DEFAULT_LAT, DEFAULT_LNG], { draggable: true, icon: yellowIcon }).addTo(map);
 
-    marker = new google.maps.Marker({
-      position: center,
-      map: map,
-      draggable: true,
-      animation: google.maps.Animation.DROP,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 12,
-        fillColor: '#F59E0B',
-        fillOpacity: 1,
-        strokeColor: '#ffffff',
-        strokeWeight: 3
-      }
-    });
-
-    marker.addListener('dragend', function() {
-      const pos = marker.getPosition();
-      selectedLat = pos.lat();
-      selectedLng = pos.lng();
+    marker.on('dragend', function() {
+      var pos = marker.getLatLng();
+      selectedLat = pos.lat;
+      selectedLng = pos.lng;
       reverseGeocode(selectedLat, selectedLng);
     });
 
-    map.addListener('click', function(e) {
-      marker.setPosition(e.latLng);
-      selectedLat = e.latLng.lat();
-      selectedLng = e.latLng.lng();
+    map.on('click', function(e) {
+      marker.setLatLng(e.latlng);
+      selectedLat = e.latlng.lat;
+      selectedLng = e.latlng.lng;
       reverseGeocode(selectedLat, selectedLng);
     });
   }
 
   function reverseGeocode(lat, lng) {
-    const el = document.getElementById('addressText');
+    var el = document.getElementById('addressText');
     el.textContent = 'Loading address...';
     el.classList.add('placeholder');
 
-    geocoder.geocode({ location: { lat, lng } }, function(results, status) {
-      if (status === 'OK' && results[0]) {
-        selectedAddress = results[0].formatted_address;
-        el.textContent = selectedAddress;
-        el.classList.remove('placeholder');
+    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && data.display_name) {
+          selectedAddress = data.display_name;
+          el.textContent = selectedAddress;
+          el.classList.remove('placeholder');
+        } else {
+          selectedAddress = lat.toFixed(6) + ', ' + lng.toFixed(6);
+          el.textContent = selectedAddress;
+          el.classList.remove('placeholder');
+        }
         document.getElementById('btnConfirm').disabled = false;
-      } else {
+      })
+      .catch(function() {
         selectedAddress = lat.toFixed(6) + ', ' + lng.toFixed(6);
         el.textContent = selectedAddress;
         el.classList.remove('placeholder');
         document.getElementById('btnConfirm').disabled = false;
-      }
-    });
+      });
   }
 
   function resetPin() {
-    const center = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
-    marker.setPosition(center);
-    map.panTo(center);
+    marker.setLatLng([DEFAULT_LAT, DEFAULT_LNG]);
+    map.setView([DEFAULT_LAT, DEFAULT_LNG], 13);
     selectedLat = null;
     selectedLng = null;
     selectedAddress = '';
@@ -365,17 +355,17 @@
   function submitLocation() {
     if (!selectedLat || !selectedLng) return;
 
-    const overlay = document.getElementById('statusOverlay');
+    var overlay = document.getElementById('statusOverlay');
     overlay.classList.add('show');
     document.getElementById('statusSpinner').style.display = 'block';
     document.getElementById('statusIcon').style.display = 'none';
     document.getElementById('statusMsg').textContent = 'Sending location...';
     document.getElementById('statusSub').textContent = '';
 
-    const bid = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
-    const mapsUrl = 'https://www.google.com/maps?q=' + selectedLat + ',' + selectedLng;
+    var bid = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
+    var mapsUrl = 'https://www.google.com/maps?q=' + selectedLat + ',' + selectedLng;
 
-    const payload = {
+    var payload = {
       bookingId: bid,
       latitude: selectedLat,
       longitude: selectedLng,
@@ -409,8 +399,6 @@
     });
   }
 </script>
-
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdSWnl2dsx-qbSPOr028Jc_9oBmPta9-o&callback=initMap"></script>
 
 </body>
 </html>
