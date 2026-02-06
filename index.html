@@ -151,7 +151,6 @@
     <div class="icon" id="statusIcon" style="display:none"></div>
     <div class="msg" id="statusMsg">Sending location...</div>
     <div class="sub" id="statusSub"></div>
-    <div id="redirectMsg" style="display:none; margin-top:12px; font-size:13px; color:#6B7280;">Returning to LINE...</div>
   </div>
 </div>
 
@@ -286,8 +285,14 @@
       document.getElementById('statusIcon').textContent = '✓';
       document.getElementById('statusMsg').textContent = 'Location sent!';
       document.getElementById('statusSub').textContent = 'Provider group has been notified';
-      document.getElementById('redirectMsg').style.display = 'block';
-      setTimeout(function() { location.href = 'https://line.me/R/'; }, 1500);
+      // Try to close the in-app browser after 1.5s
+      setTimeout(function() {
+        try { window.close(); } catch(e) {}
+        // If still open, show manual close message
+        setTimeout(function() {
+          document.getElementById('statusSub').textContent = 'You can close this tab now';
+        }, 500);
+      }, 1500);
     })
     .catch(function() {
       document.getElementById('statusSpinner').style.display = 'none';
