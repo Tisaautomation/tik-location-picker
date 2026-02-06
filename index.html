@@ -34,43 +34,50 @@
 
   .header {
     padding: 20px 24px 16px;
-    text-align: center;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
   }
 
   .logo {
-    height: 48px;
-    margin-bottom: 12px;
+    height: 56px;
   }
 
   .booking-badge {
-    display: inline-block;
     background: #e0e0e5;
     box-shadow: inset 3px 3px 6px #b8b8bd, inset -3px -3px 6px #ffffff;
-    border-radius: 12px;
-    padding: 8px 20px;
-    margin-bottom: 8px;
+    border-radius: 14px;
+    padding: 10px 24px;
+    text-align: right;
   }
 
   .booking-badge span {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     color: #6b6b78;
     letter-spacing: 0.5px;
   }
 
   .booking-badge strong {
-    font-size: 18px;
+    font-size: 24px;
     font-weight: 700;
     color: #7c3aed;
     display: block;
     margin-top: 2px;
   }
 
+  .header-bottom {
+    text-align: center;
+  }
+
   .title {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 700;
     color: #3a3a45;
-    margin-top: 8px;
   }
 
   .subtitle {
@@ -224,13 +231,17 @@
 
 <div class="card" id="mainCard">
   <div class="header">
-    <img class="logo" src="https://cdn.shopify.com/s/files/1/0708/1164/8194/files/Main_Logo_1.png?v=1765748983" alt="Tour In Koh Samui">
-    <div class="booking-badge">
-      <span>BOOKING</span>
-      <strong id="bookingDisplay">---</strong>
+    <div class="header-top">
+      <img class="logo" src="https://cdn.shopify.com/s/files/1/0708/1164/8194/files/Main_Logo_1.png?v=1765748983" alt="Tour In Koh Samui">
+      <div class="booking-badge">
+        <span>BOOKING</span>
+        <strong id="bookingDisplay">---</strong>
+      </div>
     </div>
-    <div class="title">Select Pickup Location</div>
-    <div class="subtitle">Drag the pin to the exact pickup point</div>
+    <div class="header-bottom">
+      <div class="title">Select Pickup Location</div>
+      <div class="subtitle">Drag the pin to the exact pickup point</div>
+    </div>
   </div>
 
   <div id="map"></div>
@@ -402,3 +413,4 @@
 
 </body>
 </html>
+
