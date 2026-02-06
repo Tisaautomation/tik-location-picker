@@ -151,7 +151,7 @@
     <div class="icon" id="statusIcon" style="display:none"></div>
     <div class="msg" id="statusMsg">Sending location...</div>
     <div class="sub" id="statusSub"></div>
-    <button class="btn primary" id="btnClose" style="display:none; margin-top:20px;" onclick="closePage()">Close</button>
+    <div id="redirectMsg" style="display:none; margin-top:12px; font-size:13px; color:#6B7280;">Returning to LINE...</div>
   </div>
 </div>
 
@@ -178,13 +178,6 @@
   } else {
     var d = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
     document.getElementById('bookingDisplay').textContent = d;
-  }
-
-  function closePage() {
-    try { window.close(); } catch(e) {}
-    document.getElementById('statusMsg').textContent = 'Location saved!';
-    document.getElementById('statusSub').textContent = 'You can close this window';
-    document.getElementById('btnClose').style.display = 'none';
   }
 
   function initMap() {
@@ -293,7 +286,8 @@
       document.getElementById('statusIcon').textContent = '✓';
       document.getElementById('statusMsg').textContent = 'Location sent!';
       document.getElementById('statusSub').textContent = 'Provider group has been notified';
-      document.getElementById('btnClose').style.display = 'block';
+      document.getElementById('redirectMsg').style.display = 'block';
+      setTimeout(function() { location.href = 'https://line.me/R/'; }, 1500);
     })
     .catch(function() {
       document.getElementById('statusSpinner').style.display = 'none';
