@@ -151,7 +151,7 @@
     <div class="icon" id="statusIcon" style="display:none"></div>
     <div class="msg" id="statusMsg">Sending location...</div>
     <div class="sub" id="statusSub"></div>
-    <button class="btn primary" id="btnClose" style="display:none; margin-top:20px;" onclick="closePage()">Back to LINE</button>
+    <button class="btn primary" id="btnClose" style="display:none; margin-top:20px;" onclick="closePage()">Close</button>
   </div>
 </div>
 
@@ -181,10 +181,10 @@
   }
 
   function closePage() {
-    // Try LINE in-app browser close methods
     try { window.close(); } catch(e) {}
-    // Fallback: redirect to LINE
-    setTimeout(function() { location.href = 'https://line.me/R/'; }, 300);
+    document.getElementById('statusMsg').textContent = 'Location saved!';
+    document.getElementById('statusSub').textContent = 'You can close this window';
+    document.getElementById('btnClose').style.display = 'none';
   }
 
   function initMap() {
