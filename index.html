@@ -98,7 +98,7 @@
   .status-overlay { display: none; position: fixed; inset: 0; background: rgba(224,224,229,0.92); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
   .status-overlay.show { display: flex; }
   .status-box { background: #e0e0e5; border-radius: 24px; box-shadow: 8px 8px 20px #b8b8bd, -8px -8px 20px #ffffff; padding: 32px 40px; text-align: center; }
-  .status-box .icon { font-size: 40px; margin-bottom: 12px; }
+  .status-box .icon { font-size: 48px; margin-bottom: 12px; color: #22C55E; }
   .status-box .msg { font-size: 16px; font-weight: 600; color: #3a3a45; }
   .status-box .sub { font-size: 13px; color: #8a8a95; margin-top: 6px; }
   .spinner { width: 36px; height: 36px; border: 3px solid #d0d0d5; border-top: 3px solid #7c3aed; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
@@ -151,6 +151,7 @@
     <div class="icon" id="statusIcon" style="display:none"></div>
     <div class="msg" id="statusMsg">Sending location...</div>
     <div class="sub" id="statusSub"></div>
+    <button class="btn primary" id="btnClose" style="display:none; margin-top:20px;" onclick="closePage()">Back to LINE</button>
   </div>
 </div>
 
@@ -177,6 +178,13 @@
   } else {
     var d = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
     document.getElementById('bookingDisplay').textContent = d;
+  }
+
+  function closePage() {
+    // Try LINE in-app browser close methods
+    try { window.close(); } catch(e) {}
+    // Fallback: redirect to LINE
+    setTimeout(function() { location.href = 'https://line.me/R/'; }, 300);
   }
 
   function initMap() {
@@ -282,9 +290,10 @@
     .then(function() {
       document.getElementById('statusSpinner').style.display = 'none';
       document.getElementById('statusIcon').style.display = 'block';
-      document.getElementById('statusIcon').textContent = 'OK';
+      document.getElementById('statusIcon').textContent = '✓';
       document.getElementById('statusMsg').textContent = 'Location sent!';
-      document.getElementById('statusSub').textContent = 'You can close this window';
+      document.getElementById('statusSub').textContent = 'Provider group has been notified';
+      document.getElementById('btnClose').style.display = 'block';
     })
     .catch(function() {
       document.getElementById('statusSpinner').style.display = 'none';
