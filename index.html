@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Select Pickup Location</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #e0e0e5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    color: #3a3a45;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: #e0e0e5;
+    border-radius: 24px;
+    box-shadow: 8px 8px 20px #b8b8bd, -8px -8px 20px #ffffff;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .header {
+    padding: 20px 24px 16px;
+    text-align: center;
+  }
+
+  .logo {
+    height: 48px;
+    margin-bottom: 12px;
+  }
+
+  .booking-badge {
+    display: inline-block;
+    background: #e0e0e5;
+    box-shadow: inset 3px 3px 6px #b8b8bd, inset -3px -3px 6px #ffffff;
+    border-radius: 12px;
+    padding: 8px 20px;
+    margin-bottom: 8px;
+  }
+
+  .booking-badge span {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b6b78;
+    letter-spacing: 0.5px;
+  }
+
+  .booking-badge strong {
+    font-size: 18px;
+    font-weight: 700;
+    color: #7c3aed;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #3a3a45;
+    margin-top: 8px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #8a8a95;
+    margin-top: 4px;
+  }
+
+  #map {
+    width: 100%;
+    height: 340px;
+    border-top: 1px solid #d0d0d5;
+    border-bottom: 1px solid #d0d0d5;
+  }
+
+  .address-bar {
+    padding: 14px 20px;
+    background: #e0e0e5;
+    box-shadow: inset 2px 2px 5px #b8b8bd, inset -2px -2px 5px #ffffff;
+    margin: 16px;
+    border-radius: 14px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .address-bar .pin-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: #F59E0B;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 2px 2px 6px #b8b8bd, -2px -2px 6px #ffffff;
+  }
+
+  .address-text {
+    font-size: 13px;
+    color: #4a4a55;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  .address-text.placeholder {
+    color: #a0a0ab;
+    font-style: italic;
+  }
+
+  .actions {
+    padding: 0 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-confirm {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-confirm.primary {
+    background: #22C55E;
+    color: white;
+    box-shadow: 4px 4px 12px #b8b8bd, -4px -4px 12px #ffffff;
+  }
+
+  .btn-confirm.primary:active {
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.15), inset -3px -3px 6px rgba(255,255,255,0.1);
+    transform: scale(0.98);
+  }
+
+  .btn-confirm.primary:disabled {
+    background: #a0a0ab;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .btn-confirm.secondary {
+    background: #e0e0e5;
+    color: #6b6b78;
+    box-shadow: 4px 4px 12px #b8b8bd, -4px -4px 12px #ffffff;
+  }
+
+  .btn-confirm.secondary:active {
+    box-shadow: inset 3px 3px 6px #b8b8bd, inset -3px -3px 6px #ffffff;
+  }
+
+  .status-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(224,224,229,0.92);
+    z-index: 1000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .status-overlay.show { display: flex; }
+
+  .status-box {
+    background: #e0e0e5;
+    border-radius: 24px;
+    box-shadow: 8px 8px 20px #b8b8bd, -8px -8px 20px #ffffff;
+    padding: 32px 40px;
+    text-align: center;
+  }
+
+  .status-box .icon { font-size: 40px; margin-bottom: 12px; }
+  .status-box .msg { font-size: 16px; font-weight: 600; color: #3a3a45; }
+  .status-box .sub { font-size: 13px; color: #8a8a95; margin-top: 6px; }
+
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #d0d0d5;
+    border-top: 3px solid #7c3aed;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-card {
+    text-align: center;
+    padding: 40px 24px;
+  }
+
+  .error-card .icon { font-size: 40px; margin-bottom: 12px; }
+  .error-card .msg { font-size: 16px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="card" id="mainCard">
+  <div class="header">
+    <img class="logo" src="https://cdn.shopify.com/s/files/1/0708/1164/8194/files/Main_Logo_1.png?v=1765748983" alt="Tour In Koh Samui">
+    <div class="booking-badge">
+      <span>BOOKING</span>
+      <strong id="bookingDisplay">---</strong>
+    </div>
+    <div class="title">Select Pickup Location</div>
+    <div class="subtitle">Drag the pin to the exact pickup point</div>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="address-bar">
+    <div class="pin-icon">P</div>
+    <div class="address-text placeholder" id="addressText">Move the pin to select a location</div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-confirm primary" id="btnConfirm" disabled onclick="submitLocation()">Accept</button>
+    <button class="btn-confirm secondary" onclick="resetPin()">Reset Pin</button>
+  </div>
+</div>
+
+<div class="status-overlay" id="statusOverlay">
+  <div class="status-box" id="statusBox">
+    <div class="spinner" id="statusSpinner"></div>
+    <div class="icon" id="statusIcon" style="display:none"></div>
+    <div class="msg" id="statusMsg">Sending location...</div>
+    <div class="sub" id="statusSub"></div>
+  </div>
+</div>
+
+<div class="card" id="errorCard" style="display:none">
+  <div class="error-card">
+    <div class="icon">X</div>
+    <div class="msg">Missing booking ID in URL</div>
+  </div>
+</div>
+
+<script>
+  // Config
+  const WEBHOOK_URL = 'https://timelessconcept.app.n8n.cloud/webhook/pick-location';
+  const DEFAULT_LAT = 9.5120;
+  const DEFAULT_LNG = 100.0136;
+
+  // State
+  let map, marker, geocoder;
+  let selectedLat = null, selectedLng = null, selectedAddress = '';
+  let bookingId = '';
+
+  // Parse booking ID from URL
+  const params = new URLSearchParams(window.location.search);
+  bookingId = params.get('bookingId') || '';
+
+  if (!bookingId) {
+    document.getElementById('mainCard').style.display = 'none';
+    document.getElementById('errorCard').style.display = 'block';
+  } else {
+    const display = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
+    document.getElementById('bookingDisplay').textContent = display;
+  }
+
+  function initMap() {
+    if (!bookingId) return;
+
+    const center = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
+
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: center,
+      zoom: 13,
+      disableDefaultUI: true,
+      zoomControl: true,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+      styles: [
+        { featureType: 'poi', stylers: [{ visibility: 'simplified' }] },
+        { featureType: 'transit', stylers: [{ visibility: 'off' }] }
+      ]
+    });
+
+    geocoder = new google.maps.Geocoder();
+
+    marker = new google.maps.Marker({
+      position: center,
+      map: map,
+      draggable: true,
+      animation: google.maps.Animation.DROP,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 12,
+        fillColor: '#F59E0B',
+        fillOpacity: 1,
+        strokeColor: '#ffffff',
+        strokeWeight: 3
+      }
+    });
+
+    marker.addListener('dragend', function() {
+      const pos = marker.getPosition();
+      selectedLat = pos.lat();
+      selectedLng = pos.lng();
+      reverseGeocode(selectedLat, selectedLng);
+    });
+
+    map.addListener('click', function(e) {
+      marker.setPosition(e.latLng);
+      selectedLat = e.latLng.lat();
+      selectedLng = e.latLng.lng();
+      reverseGeocode(selectedLat, selectedLng);
+    });
+  }
+
+  function reverseGeocode(lat, lng) {
+    const el = document.getElementById('addressText');
+    el.textContent = 'Loading address...';
+    el.classList.add('placeholder');
+
+    geocoder.geocode({ location: { lat, lng } }, function(results, status) {
+      if (status === 'OK' && results[0]) {
+        selectedAddress = results[0].formatted_address;
+        el.textContent = selectedAddress;
+        el.classList.remove('placeholder');
+        document.getElementById('btnConfirm').disabled = false;
+      } else {
+        selectedAddress = lat.toFixed(6) + ', ' + lng.toFixed(6);
+        el.textContent = selectedAddress;
+        el.classList.remove('placeholder');
+        document.getElementById('btnConfirm').disabled = false;
+      }
+    });
+  }
+
+  function resetPin() {
+    const center = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
+    marker.setPosition(center);
+    map.panTo(center);
+    selectedLat = null;
+    selectedLng = null;
+    selectedAddress = '';
+    document.getElementById('addressText').textContent = 'Move the pin to select a location';
+    document.getElementById('addressText').classList.add('placeholder');
+    document.getElementById('btnConfirm').disabled = true;
+  }
+
+  function submitLocation() {
+    if (!selectedLat || !selectedLng) return;
+
+    const overlay = document.getElementById('statusOverlay');
+    overlay.classList.add('show');
+    document.getElementById('statusSpinner').style.display = 'block';
+    document.getElementById('statusIcon').style.display = 'none';
+    document.getElementById('statusMsg').textContent = 'Sending location...';
+    document.getElementById('statusSub').textContent = '';
+
+    const bid = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
+    const mapsUrl = 'https://www.google.com/maps?q=' + selectedLat + ',' + selectedLng;
+
+    const payload = {
+      bookingId: bid,
+      latitude: selectedLat,
+      longitude: selectedLng,
+      address: selectedAddress,
+      mapsUrl: mapsUrl
+    };
+
+    fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r) {
+      if (!r.ok) throw new Error('Server error');
+      return r.text();
+    })
+    .then(function() {
+      document.getElementById('statusSpinner').style.display = 'none';
+      document.getElementById('statusIcon').style.display = 'block';
+      document.getElementById('statusIcon').textContent = 'OK';
+      document.getElementById('statusMsg').textContent = 'Location sent!';
+      document.getElementById('statusSub').textContent = 'You can close this window';
+    })
+    .catch(function(err) {
+      document.getElementById('statusSpinner').style.display = 'none';
+      document.getElementById('statusIcon').style.display = 'block';
+      document.getElementById('statusIcon').textContent = '!';
+      document.getElementById('statusMsg').textContent = 'Failed to send';
+      document.getElementById('statusSub').textContent = 'Please try again';
+      setTimeout(function() { overlay.classList.remove('show'); }, 2500);
+    });
+  }
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdSWnl2dsx-qbSPOr028Jc_9oBmPta9-o&callback=initMap"></script>
+
+</body>
+</html>
