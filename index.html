@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Select Pickup Location</title>
+<title>Select Pickup Option — Tour In Koh Samui</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -48,6 +48,46 @@
   .header-bottom { text-align: center; padding-bottom: 4px; }
   .title { font-size: 22px; font-weight: 700; color: #3a3a45; }
   .subtitle { font-size: 13px; color: #8a8a95; margin-top: 3px; }
+
+  /* OWN ARRIVAL BUTTON */
+  .own-arrival-section {
+    padding: 0 16px 16px;
+  }
+  .own-arrival-btn {
+    width: 100%;
+    padding: 18px 16px;
+    border: none;
+    border-radius: 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    background: linear-gradient(135deg, #7c3aed, #0CC0DF);
+    color: white;
+    box-shadow: 4px 4px 12px rgba(124,58,237,0.35), -2px -2px 8px rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+  }
+  .own-arrival-btn:active { transform: scale(0.98); box-shadow: 2px 2px 8px rgba(124,58,237,0.3); }
+  .own-arrival-btn .icon { font-size: 22px; }
+  .own-arrival-btn .text-wrap { text-align: left; }
+  .own-arrival-btn .main-text { font-size: 15px; font-weight: 700; display: block; }
+  .own-arrival-btn .sub-text { font-size: 11px; font-weight: 500; opacity: 0.85; display: block; margin-top: 1px; }
+
+  .divider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px 16px;
+  }
+  .divider-line { flex: 1; height: 1px; background: #cccccc; }
+  .divider-text { font-size: 12px; font-weight: 600; color: #9a9aaa; letter-spacing: 0.5px; white-space: nowrap; }
+
+  /* MAP SECTION */
   .search-wrap { padding: 0 16px 12px; position: relative; }
   .search-icon { position: absolute; left: 30px; top: 50%; transform: translateY(-50%); color: #8a8a95; pointer-events: none; z-index: 2; }
   .search-icon svg { width: 16px; height: 16px; }
@@ -95,6 +135,40 @@
   .btn.primary:disabled { background: #a0a0ab; cursor: not-allowed; box-shadow: none; }
   .btn.secondary { background: #e0e0e5; color: #6b6b78; box-shadow: 4px 4px 12px #b8b8bd, -4px -4px 12px #ffffff; }
   .btn.secondary:active { box-shadow: inset 3px 3px 6px #b8b8bd, inset -3px -3px 6px #ffffff; }
+
+  /* OWN ARRIVAL CONFIRM MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(224,224,229,0.92); z-index: 900; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #e0e0e5;
+    border-radius: 24px;
+    box-shadow: 8px 8px 20px #b8b8bd, -8px -8px 20px #ffffff;
+    padding: 28px 24px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+  }
+  .modal-icon { font-size: 48px; margin-bottom: 12px; }
+  .modal-title { font-size: 19px; font-weight: 700; color: #3a3a45; margin-bottom: 8px; }
+  .modal-desc { font-size: 13px; color: #6b6b78; line-height: 1.6; margin-bottom: 20px; }
+  .modal-info-box {
+    background: #e0e0e5;
+    box-shadow: inset 3px 3px 6px #b8b8bd, inset -3px -3px 6px #ffffff;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #4a4a55;
+    text-align: left;
+    line-height: 1.7;
+  }
+  .modal-info-box strong { color: #7c3aed; }
+  .modal-btn-row { display: flex; gap: 10px; }
+  .modal-btn { flex: 1; padding: 14px; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .modal-btn.confirm { background: linear-gradient(135deg, #7c3aed, #0CC0DF); color: white; box-shadow: 3px 3px 8px rgba(124,58,237,0.3); }
+  .modal-btn.cancel { background: #e0e0e5; color: #6b6b78; box-shadow: 3px 3px 8px #b8b8bd, -3px -3px 8px #ffffff; }
+
+  /* STATUS OVERLAY */
   .status-overlay { display: none; position: fixed; inset: 0; background: rgba(224,224,229,0.92); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
   .status-overlay.show { display: flex; }
   .status-box { background: #e0e0e5; border-radius: 24px; box-shadow: 8px 8px 20px #b8b8bd, -8px -8px 20px #ffffff; padding: 32px 40px; text-align: center; }
@@ -103,6 +177,7 @@
   .status-box .sub { font-size: 13px; color: #8a8a95; margin-top: 6px; }
   .spinner { width: 36px; height: 36px; border: 3px solid #d0d0d5; border-top: 3px solid #7c3aed; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
   .error-card { text-align: center; padding: 40px 24px; }
   .error-card .msg { font-size: 16px; font-weight: 600; }
   .pac-container { border-radius: 12px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.15); font-family: 'DM Sans', sans-serif; margin-top: 4px; }
@@ -122,11 +197,29 @@
       </div>
     </div>
     <div class="header-bottom">
-      <div class="title">Select Pickup Location</div>
-      <div class="subtitle">Search or drag the pin to the pickup point</div>
+      <div class="title">Pickup Option</div>
+      <div class="subtitle">Choose how you'd like to join your tour</div>
     </div>
   </div>
 
+  <!-- OWN ARRIVAL BUTTON -->
+  <div class="own-arrival-section">
+    <button class="own-arrival-btn" onclick="showOwnArrivalModal()">
+      <span class="icon">🚶</span>
+      <span class="text-wrap">
+        <span class="main-text">I'll arrive on my own</span>
+        <span class="sub-text">No pickup needed — I'll go directly to the meeting point</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="divider-row">
+    <div class="divider-line"></div>
+    <div class="divider-text">OR SELECT PICKUP LOCATION</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- MAP SECTION -->
   <div class="search-wrap">
     <div class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
     <input type="text" id="searchInput" class="search-bar" placeholder="Search hotel, address, place...">
@@ -135,21 +228,42 @@
   <div id="map"></div>
 
   <div class="address-bar">
-    <div class="pin-icon">P</div>
-    <div class="address-text placeholder" id="addressText">Move the pin to select a location</div>
+    <div class="pin-icon">📍</div>
+    <div class="address-text placeholder" id="addressText">Move the pin to select your pickup location</div>
   </div>
 
   <div class="actions">
-    <button class="btn primary" id="btnConfirm" disabled onclick="submitLocation()">Accept</button>
+    <button class="btn primary" id="btnConfirm" disabled onclick="submitLocation()">Confirm Pickup Location</button>
     <button class="btn secondary" onclick="resetPin()">Reset Pin</button>
   </div>
 </div>
 
+<!-- OWN ARRIVAL CONFIRM MODAL -->
+<div class="modal-overlay" id="ownArrivalModal">
+  <div class="modal-box">
+    <div class="modal-icon">🚶</div>
+    <div class="modal-title">Arrive on Your Own?</div>
+    <div class="modal-desc">You've selected to go directly to the tour meeting point. No pickup will be arranged.</div>
+    <div class="modal-info-box">
+      <strong>✅ What this means:</strong><br>
+      • No driver will come to your hotel<br>
+      • You'll receive the <strong>meeting point details</strong> by email<br>
+      • Our team and provider will be notified<br>
+      • You can still contact us if you need directions
+    </div>
+    <div class="modal-btn-row">
+      <button class="modal-btn cancel" onclick="closeOwnArrivalModal()">← Go Back</button>
+      <button class="modal-btn confirm" onclick="submitOwnArrival()">Confirm 🚶</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS OVERLAY -->
 <div class="status-overlay" id="statusOverlay">
   <div class="status-box">
     <div class="spinner" id="statusSpinner"></div>
     <div class="icon" id="statusIcon" style="display:none"></div>
-    <div class="msg" id="statusMsg">Sending location...</div>
+    <div class="msg" id="statusMsg">Sending...</div>
     <div class="sub" id="statusSub"></div>
   </div>
 </div>
@@ -161,7 +275,7 @@
 </div>
 
 <script>
-  var WEBHOOK_URL = 'https://timelessconcept.app.n8n.cloud/webhook/pick-location';
+  var WEBHOOK_URL = 'https://n8n-production-6ffa.up.railway.app/webhook/pick-location';
   var DEFAULT_LAT = 9.5120;
   var DEFAULT_LNG = 100.0136;
   var map, marker, geocoder, autocomplete;
@@ -177,6 +291,41 @@
   } else {
     var d = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
     document.getElementById('bookingDisplay').textContent = d;
+  }
+
+  function showOwnArrivalModal() {
+    document.getElementById('ownArrivalModal').classList.add('show');
+  }
+
+  function closeOwnArrivalModal() {
+    document.getElementById('ownArrivalModal').classList.remove('show');
+  }
+
+  function submitOwnArrival() {
+    closeOwnArrivalModal();
+    showStatus('Sending your preference...');
+
+    var bid = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
+
+    fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookingId: bid,
+        ownArrival: true,
+        address: 'OWN ARRIVAL — No Pickup Needed',
+        mapsUrl: null,
+        latitude: null,
+        longitude: null
+      })
+    })
+    .then(function(r) { if (!r.ok) throw new Error('err'); return r.text(); })
+    .then(function() {
+      showSuccess('🚶', 'Own Arrival Confirmed!', 'You\'ll receive meeting point details by email. Our provider has been notified.');
+    })
+    .catch(function() {
+      showError();
+    });
   }
 
   function initMap() {
@@ -255,7 +404,7 @@
     map.panTo(center);
     map.setZoom(13);
     selectedLat = null; selectedLng = null; selectedAddress = '';
-    document.getElementById('addressText').textContent = 'Move the pin to select a location';
+    document.getElementById('addressText').textContent = 'Move the pin to select your pickup location';
     document.getElementById('addressText').classList.add('placeholder');
     document.getElementById('btnConfirm').disabled = true;
     document.getElementById('searchInput').value = '';
@@ -263,12 +412,7 @@
 
   function submitLocation() {
     if (!selectedLat || !selectedLng) return;
-    var overlay = document.getElementById('statusOverlay');
-    overlay.classList.add('show');
-    document.getElementById('statusSpinner').style.display = 'block';
-    document.getElementById('statusIcon').style.display = 'none';
-    document.getElementById('statusMsg').textContent = 'Sending location...';
-    document.getElementById('statusSub').textContent = '';
+    showStatus('Sending location...');
 
     var bid = bookingId.startsWith('#') ? bookingId : '#' + bookingId;
     var mapsUrl = 'https://www.google.com/maps?q=' + selectedLat + ',' + selectedLng;
@@ -276,35 +420,59 @@
     fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookingId: bid, latitude: selectedLat, longitude: selectedLng, address: selectedAddress, mapsUrl: mapsUrl })
+      body: JSON.stringify({
+        bookingId: bid,
+        ownArrival: false,
+        latitude: selectedLat,
+        longitude: selectedLng,
+        address: selectedAddress,
+        mapsUrl: mapsUrl
+      })
     })
     .then(function(r) { if (!r.ok) throw new Error('err'); return r.text(); })
     .then(function() {
-      document.getElementById('statusSpinner').style.display = 'none';
-      document.getElementById('statusIcon').style.display = 'block';
-      document.getElementById('statusIcon').textContent = '✓';
-      document.getElementById('statusMsg').textContent = 'Location sent!';
-      document.getElementById('statusSub').textContent = 'Provider group has been notified';
-      // Try to close the in-app browser after 1.5s
-      setTimeout(function() {
-        try { window.close(); } catch(e) {}
-        // If still open, show manual close message
-        setTimeout(function() {
-          document.getElementById('statusSub').textContent = 'You can close this tab now';
-        }, 500);
-      }, 1500);
+      showSuccess('✓', 'Location Sent!', 'Provider has been notified. You\'ll receive a confirmation email.');
     })
     .catch(function() {
-      document.getElementById('statusSpinner').style.display = 'none';
-      document.getElementById('statusIcon').style.display = 'block';
-      document.getElementById('statusIcon').textContent = '!';
-      document.getElementById('statusMsg').textContent = 'Failed to send';
-      document.getElementById('statusSub').textContent = 'Please try again';
-      setTimeout(function() { overlay.classList.remove('show'); }, 2500);
+      showError();
     });
+  }
+
+  function showStatus(msg) {
+    var overlay = document.getElementById('statusOverlay');
+    overlay.classList.add('show');
+    document.getElementById('statusSpinner').style.display = 'block';
+    document.getElementById('statusIcon').style.display = 'none';
+    document.getElementById('statusMsg').textContent = msg;
+    document.getElementById('statusSub').textContent = '';
+  }
+
+  function showSuccess(icon, msg, sub) {
+    document.getElementById('statusSpinner').style.display = 'none';
+    document.getElementById('statusIcon').style.display = 'block';
+    document.getElementById('statusIcon').textContent = icon;
+    document.getElementById('statusMsg').textContent = msg;
+    document.getElementById('statusSub').textContent = sub;
+    setTimeout(function() {
+      try { window.close(); } catch(e) {}
+      setTimeout(function() {
+        document.getElementById('statusSub').textContent = 'You can close this tab now';
+      }, 500);
+    }, 1500);
+  }
+
+  function showError() {
+    document.getElementById('statusSpinner').style.display = 'none';
+    document.getElementById('statusIcon').style.display = 'block';
+    document.getElementById('statusIcon').textContent = '⚠️';
+    document.getElementById('statusMsg').textContent = 'Failed to send';
+    document.getElementById('statusSub').textContent = 'Please try again';
+    setTimeout(function() {
+      document.getElementById('statusOverlay').classList.remove('show');
+    }, 2500);
   }
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB93UHgEeBL2SljHS7Jqekw5ZSBppdrm3w&libraries=places&callback=initMap"></script>
 </body>
 </html>
-<!-- v3 1770363019 -->
+<!-- v4-own-arrival 1742360000 -->
